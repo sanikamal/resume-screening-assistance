@@ -8,7 +8,9 @@ import pinecone
 from pypdf import PdfReader
 from langchain.llms.openai import OpenAI
 from langchain.chains.summarize import load_summarize_chain
-from langchain import HuggingFaceHub
+from langchain_community.llms import HuggingFaceHub
+
+os.environ["HUGGINGFACEHUB_API_TOKEN"]=st.secrets["HUGGINGFACEHUB_API_TOKEN"]
 
 
 #Extract Information from PDF file
