@@ -2,6 +2,8 @@ import streamlit as st
 from dotenv import load_dotenv
 from utils import *
 import uuid
+import os
+os.environ["HUGGINGFACEHUB_API_TOKEN"]=st.secrets["HUGGINGFACEHUB_API_TOKEN"]
 
 #Creating session variables
 if 'unique_id' not in st.session_state:
