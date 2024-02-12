@@ -16,6 +16,18 @@ def main():
     st.title("HR - Resume Screening Assistance...💁 ")
     st.subheader("I can help you in resume screening process")
 
+    # Add settings for OpenAI API
+    st.sidebar.header("OpenAI API Settings")
+    api_key = st.sidebar.text_input("OpenAI API Key", key="api_key")
+    # engine = st.sidebar.selectbox("Engine", ["davinci", "curie"], key="engine")
+    max_tokens = st.sidebar.number_input("Max Tokens", min_value=1, value=150, key="max_tokens")
+
+    # Add settings for Pinecone
+    st.sidebar.header("Pinecone Settings")
+    pinecone_api_key = st.sidebar.text_input("Pinecone API Key", key="pinecone_api_key")
+    pinecone_instance = st.sidebar.text_input("Pinecone Instance Name", key="pinecone_instance")
+    pinecone_index = st.sidebar.text_input("Pinecone Index Name", key="pinecone_index")
+
     job_description = st.text_area("Please paste the 'JOB DESCRIPTION' here...",key="1")
     document_count = st.text_input("No.of 'RESUMES' to return",key="2")
     # Upload the Resumes (pdf files)
@@ -27,7 +39,7 @@ def main():
         with st.spinner('Wait for it...'):
 
             #Creating a unique ID, so that we can use to query and get only the user uploaded documents from PINECONE vector store
-            st.session_state['unique_id']=uuid.uuid4().hex
+            st.session_state['unique_id'] = uuid.uuid4().hex
 
             #Create a documents list out of all the user uploaded pdf files
             final_docs_list=create_docs(pdf,st.session_state['unique_id'])
@@ -37,12 +49,11 @@ def main():
 
             #Create embeddings instance
             embeddings=create_embeddings_load_data()
+            # Push data to Pinecone
+            push_to_pinecone(pinecone_api_key, pinecone_instance, pinecone_index, embeddings, final_docs_list)
 
-            #Push data to PINECONE
-            push_to_pinecone("b82da5a0-28ed-40c0-a21f-7e9512638079", "gcp-starter", "resumes", embeddings,final_docs_list)
-
-            #Fecth relavant documents from PINECONE
-            relavant_docs=similar_docs(job_description,document_count,"b82da5a0-28ed-40c0-a21f-7e9512638079","gcp-starter", "resumes", embeddings,st.session_state['unique_id'])
+            # Fetch relevant documents from Pinecone
+            relevant_docs = similar_docs(job_description, document_count, pinecone_api_key, pinecone_instance, pinecone_index, embeddings, st.session_state['unique_id'])
 
             #t.write(relavant_docs)
 
